@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  proxy:
+    build:
+      context: .
+    ports:
+      - "443:443"
+    volumes:
+      - ./:/app/
+    command: ["deno", "task", "start"]
+    # command: ["deno", "run", "--allow-net", "--allow-read", "--allow-env", "src/main.ts"]
