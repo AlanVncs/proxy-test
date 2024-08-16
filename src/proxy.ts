@@ -29,7 +29,7 @@ export default async function proxy({ request }: Props) {
     const requestHeaders = new Headers(request.headers)
 
     // PROXY
-    const targetOrigin = 'https://www.mundodoenxoval.com.br'
+    const targetOrigin = 'https://www.marleneenxovais.com.br' // 'https://www.mundodoenxoval.com.br'
     const targetURL = new URL(`${pathname}${search}${hash}`, targetOrigin)
     const targetHost = targetURL.host
 
@@ -37,17 +37,32 @@ export default async function proxy({ request }: Props) {
 
     removeCFHeaders(requestHeaders) // cf-headers are not ASCII-compliant
 
-    requestHeaders.set('origin', targetOrigin)
-    requestHeaders.set('host', targetHost)
-    requestHeaders.set('x-forwarded-host', targetHost)
-
-    const response = await fetch(targetURL, {
+    const requestInit: RequestInit = {
         headers: requestHeaders,
         redirect: 'manual',
         signal: request.signal,
         method: request.method,
-        body: request.body,
-    })
+    }
+
+    if (pathname.startsWith('/api/vtexid/pub/authentication/start')) {
+        const callbackUrl = 'https://www.marleneenxovais.com.br/api/vtexid/oauth/finish?popup=true'
+        const returnUrl = 'https://www.marleneenxovais.com.br/'
+
+        const bodyText = await request.text()
+        const searchParams = new URLSearchParams(bodyText)
+
+        searchParams.set('callbackUrl', callbackUrl)
+        searchParams.set('returnUrl', returnUrl)
+
+        requestInit.body = searchParams.toString()
+        console.log({ body: requestInit.body })
+    }
+
+    requestHeaders.set('origin', targetOrigin)
+    requestHeaders.set('host', targetHost)
+    requestHeaders.set('x-forwarded-host', targetHost)
+
+    const response = await fetch(targetURL, requestInit)
 
     // Change cookies domain
     const responseHeaders = new Headers(response.headers)
@@ -55,9 +70,7 @@ export default async function proxy({ request }: Props) {
 
     proxySetCookie(response.headers, responseHeaders, url)
 
-    const newBody = response.body
-
-    return new Response(newBody, {
+    return new Response(response.body, {
         status: response.status,
         headers: responseHeaders,
     })

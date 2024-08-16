@@ -3,7 +3,8 @@
     "std/": "https://deno.land/std@0.224.0/"
   },
   "tasks": {
-    "start": "deno run --allow-net --allow-read --allow-env --watch src/main.ts"
+    "start": "deno run --allow-net --allow-read --allow-env --watch src/main.ts",
+    "run": "docker compose up"
   },
   "fmt": {
     "indentWidth": 4,
