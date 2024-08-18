@@ -2,12 +2,12 @@ import proxy from './proxy.ts'
 
 const PORT = 443
 
-const cert = Deno.readTextFileSync('ssl/cert.pem')
-const key = Deno.readTextFileSync('ssl/key.pem')
+// const cert = Deno.readTextFileSync('ssl/cert.pem')
+// const key = Deno.readTextFileSync('ssl/key.pem')
 
 const port = Number(Deno.env.get('PORT') ?? PORT)
 
-Deno.serve({ port, cert, key }, (request) => {
+Deno.serve({ port }, (request) => {
 	return proxy({ request })
 	// const { pathname, search, hash } = new URL(req.url)
 
